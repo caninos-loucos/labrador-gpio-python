@@ -25,14 +25,6 @@ pin_map = {
     5:  "E2",
 }
 
-group_offset = {
-    "A": 0,
-    "B": 32,
-    "C": 64,
-    "D": 96,
-    "E": 128,
-}
-
 class GPIO:
     def __init__(self, pin, direction="out") -> None:
         if direction not in ["out", "in"]:
@@ -63,12 +55,17 @@ class GPIO:
         # test if running on a labrador; if yes, run the command
         os.system(f"[ $(uname -m) = aarch64 ] && {cmd}")
 
+    def get_offset(group):
+        group_ascii = ord(group)
+        assert group_ascii in range(ord("A"), ord("E")+1)
+        return 32 * (group_ascii - ord("A"))
+
     def get_num(pin):
         group = dict.get(pin_map, pin)
         if not group:
             print(f"Invalid pin {pin}")
             return
-        offset = group_offset[group[0]]
+        offset = GPIO.get_offset(group[0])
         group_n = int(group[1:])
         return offset + group_n
 
