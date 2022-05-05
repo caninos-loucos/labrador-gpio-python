@@ -35,7 +35,6 @@ class GPIO:
         self.num = GPIO.get_num(pin)
         if not self.num:
             return
-        GPIO.sys_cmd(f"echo {self.num} > /sys/class/gpio/export")
         GPIO.sys_cmd(f"echo {self.direction} > /sys/class/gpio/gpio{self.num}/direction")
 
     def write(self, value):
@@ -68,6 +67,13 @@ class GPIO:
         offset = GPIO.get_offset(group[0])
         group_n = int(group[1:])
         return offset + group_n
+
+    def init_sys_fs(pin):
+        GPIO.sys_cmd(f"chown -R -H caninos /sys/class/gpio")
+        num = GPIO.get_num(pin)
+        GPIO.sys_cmd(f"echo {num} > /sys/class/gpio/export")
+        sys_file = f"/sys/class/gpio/gpio{num}"
+        GPIO.sys_cmd(f"chown -R -H caninos {sys_file}")
 
 
 if __name__ == "__main__":
